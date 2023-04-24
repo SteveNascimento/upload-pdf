@@ -1,0 +1,17 @@
+/node_modules
+/prisma/*.db
+/prisma/*.log
+/prisma/migrations
+
+# local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+.vscode
+
+# yarn
+yarn-error.log
+yarn.lock
+package-lock.json
