@@ -5,38 +5,37 @@ import { Button, Card, List, Upload, message, notification } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 
 function App() {
-  //List and Download
-
-  const [list, setList] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-
-  const getFiles = async () => {
-    setLoading(true);
-    axios.get("http://localhost:5000/files").then((response) => {
-      if (response.data) {
-        setList(response.data);
-      }
-      setLoading(false);
-    });
-  };
-
+  const [fileList, setFileList] = useState([]);
+  // estado dos arquivos no servidor
+  const [files, setFiles] = useState([]);
   useEffect(() => {
     getFiles();
   }, []);
 
-  //Upload
-
-  const [fileList, setFileList] = useState([]);
+  const getFiles = async () => {
+    axios.get("http://localhost:5000/files").then((response) => {
+      if (response.data) {
+        setFileList(
+          response.data.map((file) => ({
+            name: file.name,
+            uid: file.id,
+            url: `http://localhost:5000/download/${file.id}`,
+            createdAt: file.createdAt,
+            updatedAt: file.updatedAt,
+          }))
+        );
+        setFiles(response.data.map((file) => file.id));
+      }
+      console.log(response.data);
+    });
+  };
 
   const handleUpload = async () => {
     setUploading(true);
     const formData = new FormData();
     fileList.forEach((file) => {
-      formData.append("pdf", file);
-      formData.append("name", file.name);
-      formData.append("type", file.type);
-      formData.append("size", file.size);
+      formData.append("file", file);
     });
     try {
       await axios.post("http://localhost:5000/upload", formData);
@@ -47,24 +46,50 @@ function App() {
     } catch (error) {
       message.error(error);
     } finally {
-      setFileList([]);
       setUploading(false);
+      getFiles();
+    }
+  };
+
+  const deleteFile = async (file) => {
+    try {
+      await axios.delete(`http://localhost:5000/files/${file.uid}`);
+      notification.success({
+        message: "Sucesso",
+        description: "Arquivo deletado com sucesso",
+      });
+    } catch (error) {
+      message.error(error);
+    } finally {
       getFiles();
     }
   };
 
   const props = {
     onRemove: (file) => {
-      const index = fileList.indexOf(file);
-      const newFileList = fileList.slice();
-      newFileList.splice(index, 1);
-      setFileList(newFileList);
+      // Se existe o arquivo no servidor, deleta
+      if (files.includes(file.uid)) {
+        deleteFile(file);
+        setFileList([]);
+      } else {
+        setFileList([]);
+      }
     },
     beforeUpload: (file) => {
-      setFileList([...fileList, file]);
+      if (fileList.length >= 1) {
+        message.error("Você só pode enviar um arquivo");
+        return false;
+      }
+      setFileList([file]);
       return false;
     },
     fileList,
+    defaultFileList: [...fileList].map((file) => ({
+      uid: file.id,
+      name: file.name,
+      status: "done",
+      url: `http://localhost:5000/download/${file.id}`,
+    })),
   };
 
   return (
@@ -96,39 +121,6 @@ function App() {
             Enviar
           </Button>
         </div>
-      </Card>
-      <Card
-        title="Lista de arquivos"
-        style={{
-          width: 300,
-          alignSelf: "center",
-          marginTop: 10,
-        }}
-      >
-        <List
-          style={{
-            maxWidth: 500,
-          }}
-          loading={loading}
-          itemLayout="horizontal"
-          dataSource={list}
-          renderItem={(item) => (
-            <List.Item>
-              <List.Item.Meta description={item.name} />
-              <Button
-                type="primary"
-                onClick={() => {
-                  window.open(
-                    `http://localhost:5000/download/${item.id}`,
-                    "_blank"
-                  );
-                }}
-              >
-                Download
-              </Button>
-            </List.Item>
-          )}
-        />
       </Card>
     </div>
   );
