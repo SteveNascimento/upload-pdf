@@ -46,23 +46,25 @@
 
 ## :dart: Sobre
 
-Sobre o seu projeto
+Este é um projeto de estudo para o upload de um arquivo em PDF. O sistema se resume a uma tela onde você pode fazer o upload de qualquer arquivo em PDF, o mesmo será salvo no banco e listado para o usuário, com opção de baixar o documento.
 
 ## :sparkles: Funcionalidades
 
-:heavy_check_mark: Funcionalidade 1;\
-:heavy_check_mark: Funcionalidade 2;\
-:heavy_check_mark: Funcionalidade 3;
+:heavy_check_mark: Upload de arquivos em PDF;\
+:heavy_check_mark: Listar os arquivos salvos no banco;\
+:heavy_check_mark: Fazer o download dos arquivos salvos anteriormente;
 
 ## :rocket: Tecnologias
 
 As seguintes ferramentas foram usadas na construção do projeto:
 
-- [Expo](https://expo.io/)
 - [Node.js](https://nodejs.org/en/)
 - [React](https://pt-br.reactjs.org/)
-- [React Native](https://reactnative.dev/)
 - [TypeScript](https://www.typescriptlang.org/)
+- [Express](https://expressjs.com/)
+- [Multer](https://github.com/expressjs/multer)
+- [Axios](https://axios-http.com/)
+- [Prisma](https://www.prisma.io/)
 
 ## :white_check_mark: Pré requisitos
 
@@ -74,13 +76,25 @@ Antes de começar :checkered_flag:, você precisa ter o [Git](https://git-scm.co
 # Clone este repositório
 $ git clone https://github.com/SteveNascimento/upload-pdf
 
-# Entre na pasta
-$ cd upload-pdf
+# Entre na pasta do server
+$ cd server
 
 # Instale as dependências
 $ yarn
 
-# Para iniciar o projeto
+# Crie o banco de dados SQLite com a lib prisma
+$ yarn prisma migrate dev
+
+# Inicie o servidor
+$ yarn dev
+
+# Abra outra janela e entre na pasta do client
+$ cd client
+
+# Instale as dependências
+$ yarn
+
+# Para iniciar a aplicação front
 $ yarn start
 
 # O app vai inicializar em <http://localhost:3000>
